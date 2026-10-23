@@ -17,6 +17,7 @@ import com.aigo.speech.interview.entity.InterviewReport;
 import com.aigo.speech.interview.entity.InterviewReport.ReportStatus;
 import com.aigo.speech.interview.entity.InterviewSession;
 import com.aigo.speech.interview.entity.InterviewStatus;
+import com.aigo.speech.interview.exception.InterviewReportFailedException;
 import com.aigo.speech.interview.exception.InterviewReportPendingException;
 import com.aigo.speech.interview.repository.InterviewReportRepository;
 import com.aigo.speech.interview.repository.InterviewSessionRepository;
@@ -63,8 +64,13 @@ public class InterviewReportService {
 		sessionService.validateOwnership(session, userUuidStr);
 
 		InterviewReport report = reportRepository.findBySession(session)
-			.filter(r -> r.getStatus() == ReportStatus.COMPLETED)
 			.orElseThrow(() -> new InterviewReportPendingException("아직 분석이 진행 중입니다."));
+		if (report.getStatus() == ReportStatus.FAILED) {
+			throw new InterviewReportFailedException("리포트 생성에 실패했습니다.");
+		}
+		if (report.getStatus() != ReportStatus.COMPLETED) {
+			throw new InterviewReportPendingException("아직 분석이 진행 중입니다.");
+		}
 
 		List<AnswerAnalysis> analyses = analysisRepository.findBySessionWithDetails(session);
 

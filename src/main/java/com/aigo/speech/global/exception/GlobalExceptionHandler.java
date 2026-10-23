@@ -19,6 +19,7 @@ import com.aigo.speech.auth.exception.UserNotFoundException;
 import com.aigo.speech.curriculum.exception.DuplicateScheduleException;
 import com.aigo.speech.curriculum.exception.UnauthorizedCurriculumException;
 import com.aigo.speech.global.dto.ApiResponse;
+import com.aigo.speech.interview.exception.InterviewReportFailedException;
 import com.aigo.speech.interview.exception.InterviewReportNotFoundException;
 import com.aigo.speech.interview.exception.InterviewReportPendingException;
 import com.aigo.speech.interview.exception.InterviewSessionNotFoundException;
@@ -51,6 +52,11 @@ public class GlobalExceptionHandler {
 	@ExceptionHandler(InterviewReportPendingException.class)
 	public ResponseEntity<ApiResponse<?>> handleInterviewReportPending (InterviewReportPendingException e) {
 		return ResponseEntity.status(HttpStatus.ACCEPTED).body(ApiResponse.fail(e.getMessage()));
+	}
+
+	@ExceptionHandler(InterviewReportFailedException.class)
+	public ResponseEntity<ApiResponse<?>> handleInterviewReportFailed (InterviewReportFailedException e) {
+		return ResponseEntity.status(HttpStatus.CONFLICT).body(ApiResponse.fail(e.getMessage()));
 	}
 
 	@ExceptionHandler(AnswerAnalysisNotFoundException.class)
